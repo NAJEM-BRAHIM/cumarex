@@ -48,12 +48,12 @@ result = BASIC * taux
             <field name="sequence">30</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = inputs.HS25 and inputs.HS25.amount > 0</field>
+            <field name="condition_python">result = 'HS25' in inputs and inputs['HS25'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 wage = payslip.version_id.wage if payslip.version_id else 0
 taux_horaire = wage / 191 if wage else 0
-result = inputs.HS25.amount * taux_horaire * 1.25
+result = inputs['HS25'].amount * taux_horaire * 1.25
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
@@ -64,12 +64,12 @@ result = inputs.HS25.amount * taux_horaire * 1.25
             <field name="sequence">31</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = inputs.HS50 and inputs.HS50.amount > 0</field>
+            <field name="condition_python">result = 'HS50' in inputs and inputs['HS50'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 wage = payslip.version_id.wage if payslip.version_id else 0
 taux_horaire = wage / 191 if wage else 0
-result = inputs.HS50.amount * taux_horaire * 1.50
+result = inputs['HS50'].amount * taux_horaire * 1.50
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
@@ -80,12 +80,12 @@ result = inputs.HS50.amount * taux_horaire * 1.50
             <field name="sequence">32</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = inputs.HS100 and inputs.HS100.amount > 0</field>
+            <field name="condition_python">result = 'HS100' in inputs and inputs['HS100'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 wage = payslip.version_id.wage if payslip.version_id else 0
 taux_horaire = wage / 191 if wage else 0
-result = inputs.HS100.amount * taux_horaire * 2.00
+result = inputs['HS100'].amount * taux_horaire * 2.00
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
@@ -100,9 +100,9 @@ result = inputs.HS100.amount * taux_horaire * 2.00
             <field name="sequence">40</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = inputs.PRIME_REND and inputs.PRIME_REND.amount > 0</field>
+            <field name="condition_python">result = 'PRIME_REND' in inputs and inputs['PRIME_REND'].amount > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = inputs.PRIME_REND.amount</field>
+            <field name="amount_python_compute">result = inputs['PRIME_REND'].amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
@@ -112,9 +112,9 @@ result = inputs.HS100.amount * taux_horaire * 2.00
             <field name="sequence">41</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = inputs.PRIME_BILAN and inputs.PRIME_BILAN.amount > 0</field>
+            <field name="condition_python">result = 'PRIME_BILAN' in inputs and inputs['PRIME_BILAN'].amount > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = inputs.PRIME_BILAN.amount</field>
+            <field name="amount_python_compute">result = inputs['PRIME_BILAN'].amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
@@ -124,9 +124,9 @@ result = inputs.HS100.amount * taux_horaire * 2.00
             <field name="sequence">42</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = inputs.PRIME_EXC and inputs.PRIME_EXC.amount > 0</field>
+            <field name="condition_python">result = 'PRIME_EXC' in inputs and inputs['PRIME_EXC'].amount > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = inputs.PRIME_EXC.amount</field>
+            <field name="amount_python_compute">result = inputs['PRIME_EXC'].amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
