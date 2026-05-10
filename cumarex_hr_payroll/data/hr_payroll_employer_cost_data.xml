@@ -2,11 +2,6 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- ================================================================
-             COÛT TOTAL EMPLOYEUR
-             = SBG + toutes les charges patronales
-             ================================================================ -->
-
         <record id="ma_rule_cout_employeur" model="hr.salary.rule">
             <field name="name">Coût Total Employeur</field>
             <field name="code">COUT_EMP</field>
@@ -20,11 +15,9 @@ for code in ['CNSS_PAT', 'ALLOC_FAM', 'TFP', 'AMO_PAT', 'CIMR_PAT', 'MUTUELLE_PA
     val = locals().get(code)
     if val:
         charges_pat += abs(val)
-
 result = SBG + charges_pat
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
     </data>

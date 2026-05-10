@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="hr_contract_view_form_inherit_ma" model="ir.ui.view">
-        <field name="name">hr.contract.form.inherit.ma</field>
-        <field name="model">hr.contract</field>
-        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+    <!-- Note: en Odoo 19, les champs personnalisés peuvent être ajoutés
+         soit à la vue hr.version, soit à la vue hr.employee qui affichera
+         les valeurs selon la version active.
+         Ici on hérite de la vue principale de l'employé. -->
+
+    <record id="hr_employee_view_form_inherit_ma" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.ma.cumarex</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page string="Paie Maroc"
-                      invisible="company_country_code != 'MA'">
+                <page string="Paie Maroc (Cumarex)"
+                      name="page_paie_ma_cumarex">
                     <group>
                         <group string="Ancienneté &amp; Famille">
                             <field name="l10n_ma_anciennete_date"/>
@@ -24,14 +29,14 @@
                             <field name="l10n_ma_avantage_logement"/>
                             <field name="l10n_ma_avantage_voiture"/>
                         </group>
-                        <group string="Retraite Complémentaire CIMR">
+                        <group string="CIMR (Retraite Complémentaire)">
                             <field name="l10n_ma_affilie_cimr"/>
                             <field name="l10n_ma_taux_cimr"
                                    invisible="not l10n_ma_affilie_cimr"/>
                             <field name="l10n_ma_taux_cimr_patronal"
                                    invisible="not l10n_ma_affilie_cimr"/>
                         </group>
-                        <group string="Mutuelle Complémentaire (DH/mois)">
+                        <group string="Mutuelle (DH/mois)">
                             <field name="l10n_ma_mutuelle"/>
                             <field name="l10n_ma_mutuelle_patronal"/>
                         </group>

@@ -2,8 +2,6 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- Inputs (entrées de bulletin) que l'utilisateur peut saisir manuellement -->
-
         <record id="input_heures_supp_25" model="hr.payslip.input.type">
             <field name="name">Heures supplémentaires 25%</field>
             <field name="code">HS25</field>
@@ -15,7 +13,7 @@
         </record>
 
         <record id="input_heures_supp_100" model="hr.payslip.input.type">
-            <field name="name">Heures supplémentaires 100% (jours fériés/dimanche nuit)</field>
+            <field name="name">Heures supplémentaires 100%</field>
             <field name="code">HS100</field>
         </record>
 

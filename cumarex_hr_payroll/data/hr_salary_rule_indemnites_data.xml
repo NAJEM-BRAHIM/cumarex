@@ -4,6 +4,7 @@
 
         <!-- ================================================================
              SALAIRE DE BASE
+             En Odoo 19, le salaire vient de version.wage (au lieu de contract.wage)
              ================================================================ -->
 
         <record id="ma_rule_salaire_base" model="hr.salary.rule">
@@ -13,14 +14,13 @@
             <field name="category_id" ref="hr_payroll.BASIC"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * worked_days.WORK100.number_of_days / (worked_days.WORK100.number_of_days or 1) if worked_days.WORK100 else contract.wage</field>
+            <field name="amount_python_compute">result = payslip.version_id.wage if payslip.version_id else 0</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
         <!-- ================================================================
-             PRIME D'ANCIENNETÉ (5% / 10% / 15% / 20% / 25%)
-             Calculée sur salaire de base + heures sup
-             Code du Travail : Art. 350-356
+             PRIME D'ANCIENNETÉ (5/10/15/20/25%)
+             Code du Travail Marocain - Art. 350-356
              ================================================================ -->
 
         <record id="ma_rule_anciennete" model="hr.salary.rule">
@@ -29,10 +29,10 @@
             <field name="sequence">20</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.get_anciennete_taux(payslip.date_to) > 0</field>
+            <field name="condition_python">result = payslip.version_id and payslip.version_id.get_anciennete_taux(payslip.date_to) > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-taux = contract.get_anciennete_taux(payslip.date_to)
+taux = payslip.version_id.get_anciennete_taux(payslip.date_to)
 result = BASIC * taux
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
@@ -40,10 +40,6 @@ result = BASIC * taux
 
         <!-- ================================================================
              HEURES SUPPLÉMENTAIRES
-             Art. 196 du Code du Travail
-             - 25% : entre 6h et 21h en semaine
-             - 50% : entre 21h et 6h en semaine
-             - 100% : jours de repos hebdo et fériés
              ================================================================ -->
 
         <record id="ma_rule_heures_supp_25" model="hr.salary.rule">
@@ -55,8 +51,8 @@ result = BASIC * taux
             <field name="condition_python">result = inputs.HS25 and inputs.HS25.amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-# Taux horaire = salaire de base / (191 heures conventionnelles)
-taux_horaire = contract.wage / 191
+wage = payslip.version_id.wage if payslip.version_id else 0
+taux_horaire = wage / 191 if wage else 0
 result = inputs.HS25.amount * taux_horaire * 1.25
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
@@ -71,7 +67,8 @@ result = inputs.HS25.amount * taux_horaire * 1.25
             <field name="condition_python">result = inputs.HS50 and inputs.HS50.amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-taux_horaire = contract.wage / 191
+wage = payslip.version_id.wage if payslip.version_id else 0
+taux_horaire = wage / 191 if wage else 0
 result = inputs.HS50.amount * taux_horaire * 1.50
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
@@ -86,14 +83,15 @@ result = inputs.HS50.amount * taux_horaire * 1.50
             <field name="condition_python">result = inputs.HS100 and inputs.HS100.amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-taux_horaire = contract.wage / 191
+wage = payslip.version_id.wage if payslip.version_id else 0
+taux_horaire = wage / 191 if wage else 0
 result = inputs.HS100.amount * taux_horaire * 2.00
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
         <!-- ================================================================
-             PRIMES DIVERSES
+             PRIMES DIVERSES (par inputs)
              ================================================================ -->
 
         <record id="ma_rule_prime_rendement" model="hr.salary.rule">
@@ -133,50 +131,47 @@ result = inputs.HS100.amount * taux_horaire * 2.00
         </record>
 
         <!-- ================================================================
-             INDEMNITÉS NON IMPOSABLES (jusqu'aux plafonds)
+             INDEMNITÉS (depuis version)
              ================================================================ -->
 
-        <!-- Indemnité de transport : exonérée jusqu'à 500 DH/mois -->
         <record id="ma_rule_indemnite_transport" model="hr.salary.rule">
             <field name="name">Indemnité de Transport</field>
             <field name="code">IND_TRANSPORT</field>
             <field name="sequence">50</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.l10n_ma_indemnite_transport > 0</field>
+            <field name="condition_python">result = payslip.version_id and payslip.version_id.l10n_ma_indemnite_transport > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.l10n_ma_indemnite_transport</field>
+            <field name="amount_python_compute">result = payslip.version_id.l10n_ma_indemnite_transport</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- Indemnité de panier : exonérée jusqu'à 30 DH/jour, max 20% du brut -->
         <record id="ma_rule_indemnite_panier" model="hr.salary.rule">
             <field name="name">Indemnité de Panier</field>
             <field name="code">IND_PANIER</field>
             <field name="sequence">51</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.l10n_ma_indemnite_panier > 0</field>
+            <field name="condition_python">result = payslip.version_id and payslip.version_id.l10n_ma_indemnite_panier > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.l10n_ma_indemnite_panier</field>
+            <field name="amount_python_compute">result = payslip.version_id.l10n_ma_indemnite_panier</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- Indemnité de représentation : exonérée à 10% du salaire de base pour cadres -->
         <record id="ma_rule_indemnite_representation" model="hr.salary.rule">
             <field name="name">Indemnité de Représentation</field>
             <field name="code">IND_REPR</field>
             <field name="sequence">52</field>
             <field name="category_id" ref="ma_rule_category_indemnite"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.l10n_ma_indemnite_representation > 0</field>
+            <field name="condition_python">result = payslip.version_id and payslip.version_id.l10n_ma_indemnite_representation > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.l10n_ma_indemnite_representation</field>
+            <field name="amount_python_compute">result = payslip.version_id.l10n_ma_indemnite_representation</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
         <!-- ================================================================
-             AVANTAGES EN NATURE (imposables et soumis CNSS)
+             AVANTAGES EN NATURE
              ================================================================ -->
 
         <record id="ma_rule_avantage_logement" model="hr.salary.rule">
@@ -185,9 +180,9 @@ result = inputs.HS100.amount * taux_horaire * 2.00
             <field name="sequence">60</field>
             <field name="category_id" ref="ma_rule_category_avantage"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.l10n_ma_avantage_logement > 0</field>
+            <field name="condition_python">result = payslip.version_id and payslip.version_id.l10n_ma_avantage_logement > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.l10n_ma_avantage_logement</field>
+            <field name="amount_python_compute">result = payslip.version_id.l10n_ma_avantage_logement</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
@@ -197,15 +192,14 @@ result = inputs.HS100.amount * taux_horaire * 2.00
             <field name="sequence">61</field>
             <field name="category_id" ref="ma_rule_category_avantage"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.l10n_ma_avantage_voiture > 0</field>
+            <field name="condition_python">result = payslip.version_id and payslip.version_id.l10n_ma_avantage_voiture > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.l10n_ma_avantage_voiture</field>
+            <field name="amount_python_compute">result = payslip.version_id.l10n_ma_avantage_voiture</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
         <!-- ================================================================
              SALAIRE BRUT GLOBAL (SBG)
-             = Salaire de base + ancienneté + HS + primes + indemnités + avantages
              ================================================================ -->
 
         <record id="ma_rule_salaire_brut_global" model="hr.salary.rule">
@@ -216,27 +210,29 @@ result = inputs.HS100.amount * taux_horaire * 2.00
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
+def get_val(code):
+    cat = categories.dict.get(code) if 'categories' in locals() else None
+    return cat or 0
+
 result = (BASIC
-          + (ANCIENNETE if 'ANCIENNETE' in locals() and ANCIENNETE else 0)
-          + (HS25 if 'HS25' in locals() and HS25 else 0)
-          + (HS50 if 'HS50' in locals() and HS50 else 0)
-          + (HS100 if 'HS100' in locals() and HS100 else 0)
-          + (PRIME_REND if 'PRIME_REND' in locals() and PRIME_REND else 0)
-          + (PRIME_BILAN if 'PRIME_BILAN' in locals() and PRIME_BILAN else 0)
-          + (PRIME_EXC if 'PRIME_EXC' in locals() and PRIME_EXC else 0)
-          + (IND_TRANSPORT if 'IND_TRANSPORT' in locals() and IND_TRANSPORT else 0)
-          + (IND_PANIER if 'IND_PANIER' in locals() and IND_PANIER else 0)
-          + (IND_REPR if 'IND_REPR' in locals() and IND_REPR else 0)
-          + (AVN_LOGEMENT if 'AVN_LOGEMENT' in locals() and AVN_LOGEMENT else 0)
-          + (AVN_VOITURE if 'AVN_VOITURE' in locals() and AVN_VOITURE else 0))
+          + (locals().get('ANCIENNETE') or 0)
+          + (locals().get('HS25') or 0)
+          + (locals().get('HS50') or 0)
+          + (locals().get('HS100') or 0)
+          + (locals().get('PRIME_REND') or 0)
+          + (locals().get('PRIME_BILAN') or 0)
+          + (locals().get('PRIME_EXC') or 0)
+          + (locals().get('IND_TRANSPORT') or 0)
+          + (locals().get('IND_PANIER') or 0)
+          + (locals().get('IND_REPR') or 0)
+          + (locals().get('AVN_LOGEMENT') or 0)
+          + (locals().get('AVN_VOITURE') or 0))
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
         <!-- ================================================================
              SALAIRE BRUT IMPOSABLE (SBI)
-             = SBG - exonérations (transport plafonné 500 DH, panier plafonné, etc.)
              ================================================================ -->
 
         <record id="ma_rule_salaire_brut_imposable" model="hr.salary.rule">
@@ -247,30 +243,21 @@ result = (BASIC
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-# Calcul des exonérations
-exo_transport = min(contract.l10n_ma_indemnite_transport, 500.0)
-
-# Indemnité de panier : exonérée jusqu'à 30 DH/jour ouvré (~ 22 jours = 660 DH max)
-# limitée à 20% du SBG
-jours_ouvres = 22  # standard mensuel
-exo_panier_jours = min(contract.l10n_ma_indemnite_panier, 30.0 * jours_ouvres)
+v = payslip.version_id
+exo_transport = min(v.l10n_ma_indemnite_transport, 500.0) if v else 0
+jours_ouvres = 22
+exo_panier_jours = min(v.l10n_ma_indemnite_panier, 30.0 * jours_ouvres) if v else 0
 exo_panier_pct = SBG * 0.20
 exo_panier = min(exo_panier_jours, exo_panier_pct)
-
-# Représentation : exonérée à 10% du salaire de base
-exo_repr = min(contract.l10n_ma_indemnite_representation, BASIC * 0.10)
-
-total_exonerations = exo_transport + exo_panier + exo_repr
-result = SBG - total_exonerations
+exo_repr = min(v.l10n_ma_indemnite_representation, BASIC * 0.10) if v else 0
+total_exo = exo_transport + exo_panier + exo_repr
+result = SBG - total_exo
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
         <!-- ================================================================
-             SALAIRE BRUT SOUMIS À COTISATION SOCIALE (SBC)
-             Pour CNSS : SBG - exonérations spécifiques CNSS
-             En pratique = SBI dans la plupart des cas
+             SALAIRE BRUT COTISABLE (SBC)
              ================================================================ -->
 
         <record id="ma_rule_salaire_brut_cotisable" model="hr.salary.rule">
@@ -281,11 +268,10 @@ result = SBG - total_exonerations
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-# CNSS : assiette = salaire brut hors indemnités à caractère de remboursement de frais
-# (transport et panier dans les limites légales)
-exo_transport = min(contract.l10n_ma_indemnite_transport, 500.0)
+v = payslip.version_id
+exo_transport = min(v.l10n_ma_indemnite_transport, 500.0) if v else 0
 jours_ouvres = 22
-exo_panier = min(contract.l10n_ma_indemnite_panier, 30.0 * jours_ouvres, SBG * 0.20)
+exo_panier = min(v.l10n_ma_indemnite_panier, 30.0 * jours_ouvres, SBG * 0.20) if v else 0
 result = SBG - exo_transport - exo_panier
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>

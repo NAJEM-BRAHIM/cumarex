@@ -2,10 +2,6 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- ================================================================
-             RETENUES DIVERSES
-             ================================================================ -->
-
         <record id="ma_rule_avance_salaire" model="hr.salary.rule">
             <field name="name">Avance sur Salaire</field>
             <field name="code">AVANCE</field>
@@ -16,7 +12,6 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = -inputs.AVANCE.amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
         <record id="ma_rule_acompte" model="hr.salary.rule">
@@ -29,7 +24,6 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = -inputs.ACOMPTE.amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
         <record id="ma_rule_pret" model="hr.salary.rule">
@@ -42,7 +36,6 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = -inputs.PRET.amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
         <record id="ma_rule_saisie_arret" model="hr.salary.rule">
@@ -55,10 +48,8 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = -inputs.SAISIE.amount</field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
-        <!-- Absence non payée -->
         <record id="ma_rule_absence_np" model="hr.salary.rule">
             <field name="name">Absences Non Payées</field>
             <field name="code">ABS_NP</field>
@@ -68,12 +59,11 @@
             <field name="condition_python">result = inputs.ABS_NP and inputs.ABS_NP.amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-# Retenue = (Salaire base / 26 jours) * nombre de jours absents
-salaire_journalier = contract.wage / 26.0
+wage = payslip.version_id.wage if payslip.version_id else 0
+salaire_journalier = wage / 26.0 if wage else 0
 result = -(inputs.ABS_NP.amount * salaire_journalier)
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">True</field>
         </record>
 
     </data>
