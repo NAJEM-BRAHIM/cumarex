@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Maroc - Paie (Règles Salariales)",
+    'name': "Maroc - Paie Cumarex (Règles Personnalisées)",
     'summary': "Localisation Maroc - Règles salariales complètes (CNSS, AMO, IR, indemnités)",
     'description': """
 Localisation marocaine pour la paie - Odoo 19

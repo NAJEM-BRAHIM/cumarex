@@ -5,7 +5,7 @@
         <!-- Structure salariale principale Maroc -->
         <record id="hr_payroll_structure_ma_employee" model="hr.payroll.structure">
             <field name="name">Maroc - Salarié Standard</field>
-            <field name="code">MA_STD</field>
+            <field name="code">CUMAREX_MA_STD</field>
             <field name="country_id" ref="base.ma"/>
             <field name="type_id" ref="structure_type_employee_ma"/>
         </record>
