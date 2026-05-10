@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api
+
+
+class HrPayslip(models.Model):
+    _inherit = 'hr.payslip'
+
+    l10n_ma_cnss_situation = fields.Selection(
+        selection=[
+            ('', 'Travail normal'),
+            ('SO', 'SO - Sortant'),
+            ('DE', 'DE - Décédé'),
+            ('IT', 'IT - Maternité'),
+            ('IL', 'IL - Maladie'),
+            ('AT', 'AT - Accident de Travail'),
+            ('CS', 'CS - Congé Sans salaire'),
+            ('MS', 'MS - Maintenu Sans Salaire'),
+            ('MP', 'MP - Maladie Professionnelle'),
+        ],
+        string="Situation CNSS",
+        default='',
+        help="Situation CNSS du salarié pour cette période de paie. "
+             "Cette information est utilisée lors de la génération du fichier BDS Damancom.",
+    )
+
+    l10n_ma_cnss_jours = fields.Integer(
+        string="Jours CNSS",
+        default=26,
+        help="Nombre de jours travaillés à déclarer à la CNSS (max 26).\n"
+             "Pour les situations CS/MS, doit être 0.\n"
+             "Pour les situations IT/IL/AT/MP, peut être > 0 ou = 0 selon le cas.",
+    )
+
+    @api.onchange('employee_id')
+    def _onchange_employee_cnss(self):
+        """Récupère la situation par défaut de l'employé."""
+        if self.employee_id and self.employee_id.l10n_ma_cnss_situation_default:
+            self.l10n_ma_cnss_situation = self.employee_id.l10n_ma_cnss_situation_default

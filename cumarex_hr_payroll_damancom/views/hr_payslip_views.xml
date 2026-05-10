@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hr_payslip_form_inherit_cnss" model="ir.ui.view">
+        <field name="name">hr.payslip.form.inherit.cnss</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="CNSS Damancom" name="cnss_damancom">
+                    <group>
+                        <group string="Situation CNSS de cette période">
+                            <field name="l10n_ma_cnss_situation"/>
+                            <field name="l10n_ma_cnss_jours"/>
+                        </group>
+                        <group string="Aide">
+                            <div class="text-muted" colspan="2">
+                                <p>
+                                    Indiquez ici la situation CNSS du salarié pour ce mois.
+                                </p>
+                                <ul>
+                                    <li><b>Travail normal</b>: jours et salaire renseignés (jours 1-26)</li>
+                                    <li><b>SO/DE</b>: dernier mois (salaire/jours travaillés réels)</li>
+                                    <li><b>IT/IL/AT/MP</b>: salaire peut être non nul</li>
+                                    <li><b>CS/MS</b>: jours et salaire = 0</li>
+                                </ul>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
