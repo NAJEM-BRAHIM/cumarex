@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ================================================================
+             FRAIS PROFESSIONNELS
+             - 35% si revenu brut annuel ≤ 78 000 DH (35 000 DH max)
+             - 25% si revenu brut annuel > 78 000 DH (35 000 DH max)
+             Plafond : 35 000 DH/an = ~2 916,67 DH/mois
+             ================================================================ -->
+
+        <record id="ma_rule_frais_pro" model="hr.salary.rule">
+            <field name="name">Frais Professionnels</field>
+            <field name="code">FRAIS_PRO</field>
+            <field name="sequence">300</field>
+            <field name="category_id" ref="ma_rule_category_ir"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# Base = SBI - avantages en nature (qui ne donnent pas droit aux frais pro)
+avn = ((AVN_LOGEMENT if 'AVN_LOGEMENT' in locals() and AVN_LOGEMENT else 0)
+       + (AVN_VOITURE if 'AVN_VOITURE' in locals() and AVN_VOITURE else 0))
+base_frais = SBI - avn
+
+# Taux selon configuration contrat (par défaut 35%)
+taux = float(contract.l10n_ma_taux_frais_pro or '35') / 100.0
+
+# Plafond mensuel = 35 000 / 12 = 2 916,67 DH
+PLAFOND_FRAIS_PRO_MENSUEL = 35000.0 / 12.0
+
+frais = base_frais * taux
+result = min(frais, PLAFOND_FRAIS_PRO_MENSUEL)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">False</field>
+        </record>
+
+        <!-- ================================================================
+             SALAIRE NET IMPOSABLE (SNI / RNI mensuel)
+             = SBI - Frais professionnels - CNSS salariale - AMO salariale
+                   - CIMR salariale - Mutuelle salariale
+             ================================================================ -->
+
+        <record id="ma_rule_salaire_net_imposable" model="hr.salary.rule">
+            <field name="name">Salaire Net Imposable (SNI)</field>
+            <field name="code">SNI</field>
+            <field name="sequence">310</field>
+            <field name="category_id" ref="ma_rule_category_ir"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# CNSS_SAL, AMO_SAL, etc. sont stockés négativement, on les ajoute (donc on soustrait)
+cnss = abs(CNSS_SAL) if 'CNSS_SAL' in locals() and CNSS_SAL else 0
+amo = abs(AMO_SAL) if 'AMO_SAL' in locals() and AMO_SAL else 0
+cimr = abs(CIMR_SAL) if 'CIMR_SAL' in locals() and CIMR_SAL else 0
+mut = abs(MUTUELLE_SAL) if 'MUTUELLE_SAL' in locals() and MUTUELLE_SAL else 0
+
+result = SBI - FRAIS_PRO - cnss - amo - cimr - mut
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">False</field>
+        </record>
+
+        <!-- ================================================================
+             IR BRUT - Barème mensuel 2026 (Loi de Finances 2025-2026)
+             Tranches mensuelles :
+                0 - 3 333,33      : 0%      (déduction 0)
+                3 333,34 - 5 000  : 10%     (déduction 333,33)
+                5 000,01 - 6 666,67 : 20%   (déduction 833,33)
+                6 666,68 - 8 333,33 : 30%   (déduction 1 500,00)
+                8 333,34 - 15 000 : 34%     (déduction 1 833,33)
+                > 15 000          : 37%     (déduction 2 283,33)
+             Source : CGI Article 73, ClicPaie 2026
+             ================================================================ -->
+
+        <record id="ma_rule_ir_brut" model="hr.salary.rule">
+            <field name="name">IR Brut (avant déductions)</field>
+            <field name="code">IR_BRUT</field>
+            <field name="sequence">320</field>
+            <field name="category_id" ref="ma_rule_category_ir"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = SNI > 3333.33</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+sni = SNI
+if sni &lt;= 3333.33:
+    result = 0.0
+elif sni &lt;= 5000.0:
+    result = (sni * 0.10) - 333.33
+elif sni &lt;= 6666.67:
+    result = (sni * 0.20) - 833.33
+elif sni &lt;= 8333.33:
+    result = (sni * 0.30) - 1500.00
+elif sni &lt;= 15000.0:
+    result = (sni * 0.34) - 1833.33
+else:
+    result = (sni * 0.37) - 2283.33
+
+result = max(result, 0.0)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">False</field>
+        </record>
+
+        <!-- ================================================================
+             RÉDUCTION POUR CHARGES DE FAMILLE
+             LF 2026 : 50 DH/personne/mois (600 DH/an)
+             Maximum 6 personnes = 300 DH/mois
+             ================================================================ -->
+
+        <record id="ma_rule_charges_famille" model="hr.salary.rule">
+            <field name="name">Charges de Famille (Déduction)</field>
+            <field name="code">CHARGES_FAM</field>
+            <field name="sequence">325</field>
+            <field name="category_id" ref="ma_rule_category_ir"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.l10n_ma_personnes_charge > 0 and IR_BRUT > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# 50 DH/personne/mois (LF 2026), maximum 6 personnes
+nb = min(contract.l10n_ma_personnes_charge, 6)
+deduction = nb * 50.0
+# La déduction ne peut excéder l'IR dû
+result = min(deduction, IR_BRUT)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">False</field>
+        </record>
+
+        <!-- ================================================================
+             IR NET DÛ (à retenir sur le salaire)
+             = IR Brut - Charges de famille
+             ================================================================ -->
+
+        <record id="ma_rule_ir_net" model="hr.salary.rule">
+            <field name="name">IR Net (Impôt sur le Revenu)</field>
+            <field name="code">IR_NET</field>
+            <field name="sequence">330</field>
+            <field name="category_id" ref="ma_rule_category_ir"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = IR_BRUT > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+charges = CHARGES_FAM if 'CHARGES_FAM' in locals() and CHARGES_FAM else 0
+ir_du = IR_BRUT - charges
+result = -max(ir_du, 0.0)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">True</field>
+        </record>
+
+    </data>
+</odoo>

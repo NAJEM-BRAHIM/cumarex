@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Inputs (entrées de bulletin) que l'utilisateur peut saisir manuellement -->
+
+        <record id="input_heures_supp_25" model="hr.payslip.input.type">
+            <field name="name">Heures supplémentaires 25%</field>
+            <field name="code">HS25</field>
+        </record>
+
+        <record id="input_heures_supp_50" model="hr.payslip.input.type">
+            <field name="name">Heures supplémentaires 50%</field>
+            <field name="code">HS50</field>
+        </record>
+
+        <record id="input_heures_supp_100" model="hr.payslip.input.type">
+            <field name="name">Heures supplémentaires 100% (jours fériés/dimanche nuit)</field>
+            <field name="code">HS100</field>
+        </record>
+
+        <record id="input_prime_rendement" model="hr.payslip.input.type">
+            <field name="name">Prime de rendement</field>
+            <field name="code">PRIME_REND</field>
+        </record>
+
+        <record id="input_prime_bilan" model="hr.payslip.input.type">
+            <field name="name">Prime de bilan / 13ème mois</field>
+            <field name="code">PRIME_BILAN</field>
+        </record>
+
+        <record id="input_prime_exceptionnelle" model="hr.payslip.input.type">
+            <field name="name">Prime exceptionnelle</field>
+            <field name="code">PRIME_EXC</field>
+        </record>
+
+        <record id="input_avance_salaire" model="hr.payslip.input.type">
+            <field name="name">Avance sur salaire</field>
+            <field name="code">AVANCE</field>
+        </record>
+
+        <record id="input_acompte" model="hr.payslip.input.type">
+            <field name="name">Acompte</field>
+            <field name="code">ACOMPTE</field>
+        </record>
+
+        <record id="input_pret" model="hr.payslip.input.type">
+            <field name="name">Remboursement prêt</field>
+            <field name="code">PRET</field>
+        </record>
+
+        <record id="input_saisie_arret" model="hr.payslip.input.type">
+            <field name="name">Saisie-arrêt</field>
+            <field name="code">SAISIE</field>
+        </record>
+
+        <record id="input_absence_non_payee" model="hr.payslip.input.type">
+            <field name="name">Absences non payées (jours)</field>
+            <field name="code">ABS_NP</field>
+        </record>
+
+    </data>
+</odoo>
