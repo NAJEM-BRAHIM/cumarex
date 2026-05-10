@@ -2,11 +2,7 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- ================================================================
-             SALAIRE DE BASE
-             En Odoo 19, le salaire vient de version.wage (au lieu de contract.wage)
-             ================================================================ -->
-
+        <!-- SALAIRE DE BASE -->
         <record id="ma_rule_salaire_base" model="hr.salary.rule">
             <field name="name">Salaire de Base</field>
             <field name="code">BASIC</field>
@@ -18,11 +14,7 @@
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             PRIME D'ANCIENNETÉ (5/10/15/20/25%)
-             Code du Travail Marocain - Art. 350-356
-             ================================================================ -->
-
+        <!-- PRIME D'ANCIENNETÉ -->
         <record id="ma_rule_anciennete" model="hr.salary.rule">
             <field name="name">Prime d'Ancienneté</field>
             <field name="code">ANCIENNETE</field>
@@ -38,10 +30,7 @@ result = BASIC * taux
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             HEURES SUPPLÉMENTAIRES
-             ================================================================ -->
-
+        <!-- HEURES SUPPLÉMENTAIRES (inputs as dict) -->
         <record id="ma_rule_heures_supp_25" model="hr.salary.rule">
             <field name="name">Heures Supplémentaires 25%</field>
             <field name="code">HS25</field>
@@ -90,10 +79,7 @@ result = inputs['HS100'].amount * taux_horaire * 2.00
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             PRIMES DIVERSES (par inputs)
-             ================================================================ -->
-
+        <!-- PRIMES -->
         <record id="ma_rule_prime_rendement" model="hr.salary.rule">
             <field name="name">Prime de Rendement</field>
             <field name="code">PRIME_REND</field>
@@ -130,10 +116,7 @@ result = inputs['HS100'].amount * taux_horaire * 2.00
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             INDEMNITÉS (depuis version)
-             ================================================================ -->
-
+        <!-- INDEMNITÉS -->
         <record id="ma_rule_indemnite_transport" model="hr.salary.rule">
             <field name="name">Indemnité de Transport</field>
             <field name="code">IND_TRANSPORT</field>
@@ -170,10 +153,7 @@ result = inputs['HS100'].amount * taux_horaire * 2.00
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             AVANTAGES EN NATURE
-             ================================================================ -->
-
+        <!-- AVANTAGES EN NATURE -->
         <record id="ma_rule_avantage_logement" model="hr.salary.rule">
             <field name="name">Avantage en Nature - Logement</field>
             <field name="code">AVN_LOGEMENT</field>
@@ -198,10 +178,7 @@ result = inputs['HS100'].amount * taux_horaire * 2.00
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             SALAIRE BRUT GLOBAL (SBG)
-             ================================================================ -->
-
+        <!-- SBG : calcul direct (Odoo 19 compatible) -->
         <record id="ma_rule_salaire_brut_global" model="hr.salary.rule">
             <field name="name">Salaire Brut Global (SBG)</field>
             <field name="code">SBG</field>
@@ -210,31 +187,31 @@ result = inputs['HS100'].amount * taux_horaire * 2.00
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-def get_val(code):
-    cat = categories.dict.get(code) if 'categories' in locals() else None
-    return cat or 0
-
-result = (BASIC
-          + (locals().get('ANCIENNETE') or 0)
-          + (locals().get('HS25') or 0)
-          + (locals().get('HS50') or 0)
-          + (locals().get('HS100') or 0)
-          + (locals().get('PRIME_REND') or 0)
-          + (locals().get('PRIME_BILAN') or 0)
-          + (locals().get('PRIME_EXC') or 0)
-          + (locals().get('IND_TRANSPORT') or 0)
-          + (locals().get('IND_PANIER') or 0)
-          + (locals().get('IND_REPR') or 0)
-          + (locals().get('AVN_LOGEMENT') or 0)
-          + (locals().get('AVN_VOITURE') or 0))
+v = payslip.version_id
+ind_transport = v.l10n_ma_indemnite_transport if v else 0
+ind_panier = v.l10n_ma_indemnite_panier if v else 0
+ind_repr = v.l10n_ma_indemnite_representation if v else 0
+avn_logement = v.l10n_ma_avantage_logement if v else 0
+avn_voiture = v.l10n_ma_avantage_voiture if v else 0
+taux_anc = v.get_anciennete_taux(payslip.date_to) if v else 0
+anciennete = BASIC * taux_anc
+wage = v.wage if v else 0
+taux_horaire = wage / 191 if wage else 0
+hs25 = inputs['HS25'].amount * taux_horaire * 1.25 if 'HS25' in inputs else 0
+hs50 = inputs['HS50'].amount * taux_horaire * 1.50 if 'HS50' in inputs else 0
+hs100 = inputs['HS100'].amount * taux_horaire * 2.00 if 'HS100' in inputs else 0
+prime_rend = inputs['PRIME_REND'].amount if 'PRIME_REND' in inputs else 0
+prime_bilan = inputs['PRIME_BILAN'].amount if 'PRIME_BILAN' in inputs else 0
+prime_exc = inputs['PRIME_EXC'].amount if 'PRIME_EXC' in inputs else 0
+result = (BASIC + anciennete + hs25 + hs50 + hs100
+          + prime_rend + prime_bilan + prime_exc
+          + ind_transport + ind_panier + ind_repr
+          + avn_logement + avn_voiture)
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             SALAIRE BRUT IMPOSABLE (SBI)
-             ================================================================ -->
-
+        <!-- SBI -->
         <record id="ma_rule_salaire_brut_imposable" model="hr.salary.rule">
             <field name="name">Salaire Brut Imposable (SBI)</field>
             <field name="code">SBI</field>
@@ -245,21 +222,14 @@ result = (BASIC
             <field name="amount_python_compute">
 v = payslip.version_id
 exo_transport = min(v.l10n_ma_indemnite_transport, 500.0) if v else 0
-jours_ouvres = 22
-exo_panier_jours = min(v.l10n_ma_indemnite_panier, 30.0 * jours_ouvres) if v else 0
-exo_panier_pct = SBG * 0.20
-exo_panier = min(exo_panier_jours, exo_panier_pct)
+exo_panier = min(v.l10n_ma_indemnite_panier, 660.0, SBG * 0.20) if v else 0
 exo_repr = min(v.l10n_ma_indemnite_representation, BASIC * 0.10) if v else 0
-total_exo = exo_transport + exo_panier + exo_repr
-result = SBG - total_exo
+result = SBG - exo_transport - exo_panier - exo_repr
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
-        <!-- ================================================================
-             SALAIRE BRUT COTISABLE (SBC)
-             ================================================================ -->
-
+        <!-- SBC -->
         <record id="ma_rule_salaire_brut_cotisable" model="hr.salary.rule">
             <field name="name">Salaire Brut Cotisable (SBC)</field>
             <field name="code">SBC</field>
@@ -270,8 +240,7 @@ result = SBG - total_exo
             <field name="amount_python_compute">
 v = payslip.version_id
 exo_transport = min(v.l10n_ma_indemnite_transport, 500.0) if v else 0
-jours_ouvres = 22
-exo_panier = min(v.l10n_ma_indemnite_panier, 30.0 * jours_ouvres, SBG * 0.20) if v else 0
+exo_panier = min(v.l10n_ma_indemnite_panier, 660.0, SBG * 0.20) if v else 0
 result = SBG - exo_transport - exo_panier
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>

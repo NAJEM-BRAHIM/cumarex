@@ -2,11 +2,7 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- ================================================================
-             FRAIS PROFESSIONNELS
-             35% / 25%, plafond 35 000 DH/an
-             ================================================================ -->
-
+        <!-- FRAIS PROFESSIONNELS -->
         <record id="ma_rule_frais_pro" model="hr.salary.rule">
             <field name="name">Frais Professionnels</field>
             <field name="code">FRAIS_PRO</field>
@@ -16,21 +12,16 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 v = payslip.version_id
-avn = (locals().get('AVN_LOGEMENT') or 0) + (locals().get('AVN_VOITURE') or 0)
+avn = (v.l10n_ma_avantage_logement + v.l10n_ma_avantage_voiture) if v else 0
 base_frais = SBI - avn
 taux = float(v.l10n_ma_taux_frais_pro or '35') / 100.0 if v else 0.35
-PLAFOND = 35000.0 / 12.0
-frais = base_frais * taux
-result = min(frais, PLAFOND)
+result = min(base_frais * taux, 35000.0 / 12.0)
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
             <field name="appears_on_payslip">False</field>
         </record>
 
-        <!-- ================================================================
-             SALAIRE NET IMPOSABLE (SNI / RNI mensuel)
-             ================================================================ -->
-
+        <!-- SNI -->
         <record id="ma_rule_salaire_net_imposable" model="hr.salary.rule">
             <field name="name">Salaire Net Imposable (SNI)</field>
             <field name="code">SNI</field>
@@ -39,21 +30,20 @@ result = min(frais, PLAFOND)
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-cnss = abs(locals().get('CNSS_SAL') or 0)
-amo = abs(locals().get('AMO_SAL') or 0)
-cimr = abs(locals().get('CIMR_SAL') or 0)
-mut = abs(locals().get('MUTUELLE_SAL') or 0)
+v = payslip.version_id
+cnss = abs(CNSS_SAL) if CNSS_SAL else 0
+amo = abs(AMO_SAL) if AMO_SAL else 0
+cimr = 0
+if v and v.l10n_ma_affilie_cimr and v.l10n_ma_taux_cimr:
+    cimr = SBC * (v.l10n_ma_taux_cimr / 100.0)
+mut = v.l10n_ma_mutuelle if v else 0
 result = SBI - FRAIS_PRO - cnss - amo - cimr - mut
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
             <field name="appears_on_payslip">False</field>
         </record>
 
-        <!-- ================================================================
-             IR BRUT - Barème mensuel 2026
-             0% / 10% / 20% / 30% / 34% / 37%
-             ================================================================ -->
-
+        <!-- IR BRUT - Barème mensuel 2026 -->
         <record id="ma_rule_ir_brut" model="hr.salary.rule">
             <field name="name">IR Brut</field>
             <field name="code">IR_BRUT</field>
@@ -82,31 +72,7 @@ result = max(result, 0.0)
             <field name="appears_on_payslip">False</field>
         </record>
 
-        <!-- ================================================================
-             CHARGES DE FAMILLE (50 DH/personne LF 2026, max 6)
-             ================================================================ -->
-
-        <record id="ma_rule_charges_famille" model="hr.salary.rule">
-            <field name="name">Charges de Famille (Déduction)</field>
-            <field name="code">CHARGES_FAM</field>
-            <field name="sequence">325</field>
-            <field name="category_id" ref="ma_rule_category_ir"/>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = payslip.version_id and payslip.version_id.l10n_ma_personnes_charge > 0 and IR_BRUT > 0</field>
-            <field name="amount_select">code</field>
-            <field name="amount_python_compute">
-nb = min(payslip.version_id.l10n_ma_personnes_charge, 6)
-deduction = nb * 50.0
-result = min(deduction, IR_BRUT)
-            </field>
-            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
-            <field name="appears_on_payslip">False</field>
-        </record>
-
-        <!-- ================================================================
-             IR NET (à retenir)
-             ================================================================ -->
-
+        <!-- IR NET (Odoo 19 compatible: charges famille en direct) -->
         <record id="ma_rule_ir_net" model="hr.salary.rule">
             <field name="name">IR Net</field>
             <field name="code">IR_NET</field>
@@ -116,7 +82,10 @@ result = min(deduction, IR_BRUT)
             <field name="condition_python">result = IR_BRUT > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-charges = locals().get('CHARGES_FAM') or 0
+v = payslip.version_id
+nb = v.l10n_ma_personnes_charge if v else 0
+nb = min(nb, 6)
+charges = nb * 50.0
 ir_du = IR_BRUT - charges
 result = -max(ir_du, 0.0)
             </field>

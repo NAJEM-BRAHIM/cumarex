@@ -2,6 +2,7 @@
 <odoo>
     <data noupdate="1">
 
+        <!-- NET : calcul direct sans locals/eval/categories -->
         <record id="ma_rule_salaire_net" model="hr.salary.rule">
             <field name="name">Salaire Net à Payer</field>
             <field name="code">NET</field>
@@ -10,17 +11,31 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-avn_logement = locals().get('AVN_LOGEMENT') or 0
-avn_voiture = locals().get('AVN_VOITURE') or 0
+v = payslip.version_id
+avn_logement = v.l10n_ma_avantage_logement if v else 0
+avn_voiture = v.l10n_ma_avantage_voiture if v else 0
 
-retenues = 0
-for code in ['CNSS_SAL', 'AMO_SAL', 'CIMR_SAL', 'MUTUELLE_SAL', 'IR_NET',
-             'AVANCE', 'ACOMPTE', 'PRET', 'SAISIE', 'ABS_NP']:
-    val = locals().get(code)
-    if val:
-        retenues += val
+cnss = CNSS_SAL or 0
+amo = AMO_SAL or 0
+ir = IR_NET or 0
 
-result = SBG + retenues - avn_logement - avn_voiture
+cimr_sal = 0
+if v and v.l10n_ma_affilie_cimr and v.l10n_ma_taux_cimr:
+    cimr_sal = -SBC * (v.l10n_ma_taux_cimr / 100.0)
+mut_sal = -v.l10n_ma_mutuelle if v else 0
+
+avance = -inputs['AVANCE'].amount if 'AVANCE' in inputs else 0
+acompte = -inputs['ACOMPTE'].amount if 'ACOMPTE' in inputs else 0
+pret = -inputs['PRET'].amount if 'PRET' in inputs else 0
+saisie = -inputs['SAISIE'].amount if 'SAISIE' in inputs else 0
+
+abs_np = 0
+if 'ABS_NP' in inputs:
+    wage = v.wage if v else 0
+    salaire_journalier = wage / 26.0 if wage else 0
+    abs_np = -(inputs['ABS_NP'].amount * salaire_journalier)
+
+result = SBG + cnss + amo + ir + cimr_sal + mut_sal + avance + acompte + pret + saisie + abs_np - avn_logement - avn_voiture
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>

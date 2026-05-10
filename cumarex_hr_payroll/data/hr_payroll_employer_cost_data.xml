@@ -10,11 +10,16 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-charges_pat = 0
-for code in ['CNSS_PAT', 'ALLOC_FAM', 'TFP', 'AMO_PAT', 'CIMR_PAT', 'MUTUELLE_PAT']:
-    val = locals().get(code)
-    if val:
-        charges_pat += abs(val)
+v = payslip.version_id
+cnss_pat = abs(CNSS_PAT) if CNSS_PAT else 0
+amo_pat = abs(AMO_PAT) if AMO_PAT else 0
+alloc = abs(ALLOC_FAM) if ALLOC_FAM else 0
+tfp = abs(TFP) if TFP else 0
+cimr_pat = 0
+if v and v.l10n_ma_affilie_cimr and v.l10n_ma_taux_cimr_patronal:
+    cimr_pat = SBC * (v.l10n_ma_taux_cimr_patronal / 100.0)
+mut_pat = v.l10n_ma_mutuelle_patronal if v else 0
+charges_pat = cnss_pat + amo_pat + alloc + tfp + cimr_pat + mut_pat
 result = SBG + charges_pat
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
