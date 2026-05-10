@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ================================================================
+             COÛT TOTAL EMPLOYEUR
+             = SBG + toutes les charges patronales
+             ================================================================ -->
+
+        <record id="ma_rule_cout_employeur" model="hr.salary.rule">
+            <field name="name">Coût Total Employeur</field>
+            <field name="code">COUT_EMP</field>
+            <field name="sequence">700</field>
+            <field name="category_id" ref="ma_rule_category_patronal"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+charges_pat = 0
+for code in ['CNSS_PAT', 'ALLOC_FAM', 'TFP', 'AMO_PAT', 'CIMR_PAT', 'MUTUELLE_PAT']:
+    val = locals().get(code)
+    if val:
+        charges_pat += abs(val)
+
+result = SBG + charges_pat
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">True</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Catégories de règles salariales -->
+
+        <record id="ma_rule_category_brut" model="hr.salary.rule.category">
+            <field name="name">Salaire Brut</field>
+            <field name="code">BRUT_MA</field>
+            <field name="parent_id" ref="hr_payroll.GROSS"/>
+        </record>
+
+        <record id="ma_rule_category_indemnite" model="hr.salary.rule.category">
+            <field name="name">Indemnités</field>
+            <field name="code">IND_MA</field>
+            <field name="parent_id" ref="hr_payroll.ALW"/>
+        </record>
+
+        <record id="ma_rule_category_avantage" model="hr.salary.rule.category">
+            <field name="name">Avantages en Nature</field>
+            <field name="code">AVN_MA</field>
+            <field name="parent_id" ref="hr_payroll.ALW"/>
+        </record>
+
+        <record id="ma_rule_category_cnss" model="hr.salary.rule.category">
+            <field name="name">CNSS</field>
+            <field name="code">CNSS</field>
+            <field name="parent_id" ref="hr_payroll.DED"/>
+        </record>
+
+        <record id="ma_rule_category_amo" model="hr.salary.rule.category">
+            <field name="name">AMO</field>
+            <field name="code">AMO</field>
+            <field name="parent_id" ref="hr_payroll.DED"/>
+        </record>
+
+        <record id="ma_rule_category_ir" model="hr.salary.rule.category">
+            <field name="name">Impôt sur le Revenu</field>
+            <field name="code">IR</field>
+            <field name="parent_id" ref="hr_payroll.DED"/>
+        </record>
+
+        <record id="ma_rule_category_retenue" model="hr.salary.rule.category">
+            <field name="name">Retenues Diverses</field>
+            <field name="code">RET_MA</field>
+            <field name="parent_id" ref="hr_payroll.DED"/>
+        </record>
+
+        <record id="ma_rule_category_patronal" model="hr.salary.rule.category">
+            <field name="name">Charges Patronales</field>
+            <field name="code">PAT_MA</field>
+            <field name="parent_id" ref="hr_payroll.COMP"/>
+        </record>
+
+    </data>
+</odoo>

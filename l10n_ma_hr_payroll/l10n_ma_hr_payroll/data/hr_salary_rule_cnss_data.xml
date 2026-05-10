@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ================================================================
+             COTISATIONS CNSS - PART SALARIALE
+             Plafond : 6 000 DH/mois pour les prestations sociales
+             ================================================================ -->
+
+        <!-- CNSS Salariale : 4,48% (prestations sociales court + long terme) plafonné -->
+        <!-- Détail : 4,29% PS + 0,19% IPE = 4,48% -->
+        <record id="ma_rule_cnss_sal" model="hr.salary.rule">
+            <field name="name">CNSS - Part Salariale (4,48%)</field>
+            <field name="code">CNSS_SAL</field>
+            <field name="sequence">200</field>
+            <field name="category_id" ref="ma_rule_category_cnss"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# Plafond CNSS = 6 000 DH/mois (2026)
+PLAFOND_CNSS = 6000.0
+assiette = min(SBC, PLAFOND_CNSS)
+# Taux global : 4,29% (PS) + 0,19% (IPE) = 4,48%
+result = -(assiette * 0.0448)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">True</field>
+        </record>
+
+        <!-- ================================================================
+             COTISATIONS CNSS - PART PATRONALE
+             Pour information sur le bulletin (charges patronales)
+             ================================================================ -->
+
+        <!-- CNSS Patronale : 8,98% (prestations sociales) plafonné -->
+        <record id="ma_rule_cnss_pat" model="hr.salary.rule">
+            <field name="name">CNSS - Prestations Sociales Patronale (8,98%)</field>
+            <field name="code">CNSS_PAT</field>
+            <field name="sequence">600</field>
+            <field name="category_id" ref="ma_rule_category_patronal"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+PLAFOND_CNSS = 6000.0
+assiette = min(SBC, PLAFOND_CNSS)
+# 8,60% PS + 0,38% IPE = 8,98%
+result = -(assiette * 0.0898)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">True</field>
+        </record>
+
+        <!-- Allocations Familiales Patronale : 6,40% sur salaire total (déplafonné) -->
+        <record id="ma_rule_allocations_familiales" model="hr.salary.rule">
+            <field name="name">Allocations Familiales (6,40% Patronale)</field>
+            <field name="code">ALLOC_FAM</field>
+            <field name="sequence">601</field>
+            <field name="category_id" ref="ma_rule_category_patronal"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = -(SBC * 0.0640)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">True</field>
+        </record>
+
+        <!-- Taxe de Formation Professionnelle (TFP) : 1,60% Patronale, déplafonnée -->
+        <record id="ma_rule_tfp" model="hr.salary.rule">
+            <field name="name">Taxe Formation Professionnelle (1,60%)</field>
+            <field name="code">TFP</field>
+            <field name="sequence">602</field>
+            <field name="category_id" ref="ma_rule_category_patronal"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+result = -(SBC * 0.0160)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">True</field>
+        </record>
+
+    </data>
+</odoo>
