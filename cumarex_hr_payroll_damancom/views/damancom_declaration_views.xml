@@ -157,14 +157,9 @@
                         domain="[('declaration_type', '=', 'principale')]"/>
                 <filter string="Complémentaire" name="filter_complementaire" 
                         domain="[('declaration_type', '=', 'complementaire')]"/>
-                <group expand="0" string="Grouper par">
-                    <filter string="Année" name="group_year" 
-                            context="{'group_by': 'period_year'}"/>
-                    <filter string="État" name="group_state" 
-                            context="{'group_by': 'state'}"/>
-                    <filter string="Type" name="group_type" 
-                            context="{'group_by': 'declaration_type'}"/>
-                </group>
+                <filter string="Année" name="group_year" context="{"group_by": "period_year"}"/>
+                <filter string="État" name="group_state" context="{"group_by": "state"}"/>
+                <filter string="Type" name="group_type" context="{"group_by": "declaration_type"}"/>
             </search>
         </field>
     </record>
