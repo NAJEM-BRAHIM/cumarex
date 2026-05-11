@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="ma_rule_cout_employeur" model="hr.salary.rule">
+            <field name="name">Coût Total Employeur</field>
+            <field name="code">COUT_EMP</field>
+            <field name="sequence">700</field>
+            <field name="category_id" ref="ma_rule_category_patronal"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+v = payslip.version_id
+cnss_pat = abs(CNSS_PAT) if CNSS_PAT else 0
+amo_pat = abs(AMO_PAT) if AMO_PAT else 0
+alloc = abs(ALLOC_FAM) if ALLOC_FAM else 0
+tfp = abs(TFP) if TFP else 0
+cimr_pat = 0
+if v and v.l10n_ma_affilie_cimr and v.l10n_ma_taux_cimr_patronal:
+    cimr_pat = SBC * (v.l10n_ma_taux_cimr_patronal / 100.0)
+mut_pat = v.l10n_ma_mutuelle_patronal if v else 0
+charges_pat = cnss_pat + amo_pat + alloc + tfp + cimr_pat + mut_pat
+result = SBG + charges_pat
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="ma_rule_avance_salaire" model="hr.salary.rule">
+            <field name="name">Avance sur Salaire</field>
+            <field name="code">AVANCE</field>
+            <field name="sequence">400</field>
+            <field name="category_id" ref="ma_rule_category_retenue"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'AVANCE' in inputs and inputs['AVANCE'].amount > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['AVANCE'].amount</field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+        <record id="ma_rule_acompte" model="hr.salary.rule">
+            <field name="name">Acompte</field>
+            <field name="code">ACOMPTE</field>
+            <field name="sequence">410</field>
+            <field name="category_id" ref="ma_rule_category_retenue"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ACOMPTE' in inputs and inputs['ACOMPTE'].amount > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['ACOMPTE'].amount</field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+        <record id="ma_rule_pret" model="hr.salary.rule">
+            <field name="name">Remboursement Prêt</field>
+            <field name="code">PRET</field>
+            <field name="sequence">420</field>
+            <field name="category_id" ref="ma_rule_category_retenue"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'PRET' in inputs and inputs['PRET'].amount > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['PRET'].amount</field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+        <record id="ma_rule_saisie_arret" model="hr.salary.rule">
+            <field name="name">Saisie-Arrêt</field>
+            <field name="code">SAISIE</field>
+            <field name="sequence">430</field>
+            <field name="category_id" ref="ma_rule_category_retenue"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'SAISIE' in inputs and inputs['SAISIE'].amount > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs['SAISIE'].amount</field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+        <record id="ma_rule_absence_np" model="hr.salary.rule">
+            <field name="name">Absences Non Payées</field>
+            <field name="code">ABS_NP</field>
+            <field name="sequence">440</field>
+            <field name="category_id" ref="ma_rule_category_retenue"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = 'ABS_NP' in inputs and inputs['ABS_NP'].amount > 0</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+wage = payslip.version_id.wage if payslip.version_id else 0
+salaire_journalier = wage / 26.0 if wage else 0
+result = -(inputs['ABS_NP'].amount * salaire_journalier)
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+    </data>
+</odoo>
