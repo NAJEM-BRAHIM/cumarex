@@ -118,7 +118,7 @@
                             <field name="payslip_ids">
                                 <list>
                                     <field name="employee_id"/>
-                                    <field name="number"/>
+                                    <field name="name"/>
                                     <field name="date_from"/>
                                     <field name="date_to"/>
                                     <field name="state"/>
