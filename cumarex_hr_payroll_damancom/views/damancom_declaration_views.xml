@@ -6,7 +6,7 @@
         <field name="name">damancom.declaration.list</field>
         <field name="model">damancom.declaration</field>
         <field name="arch" type="xml">
-            <list string="Déclarations CNSS Damancom" 
+            <list string="Declarations CNSS Damancom" 
                   decoration-success="state == 'validated'"
                   decoration-danger="state == 'rejected'"
                   decoration-info="state == 'generated'">
@@ -15,8 +15,8 @@
                 <field name="declaration_type"/>
                 <field name="date_declaration"/>
                 <field name="total_salaries"/>
-                <field name="total_salaire_reel" sum="Total Réel"/>
-                <field name="total_salaire_plaf" sum="Total Plafonné"/>
+                <field name="total_salaire_reel" sum="Total Reel"/>
+                <field name="total_salaire_plaf" sum="Total Plafonne"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'validated'"
                        decoration-danger="state == 'rejected'"
@@ -31,33 +31,37 @@
         <field name="name">damancom.declaration.form</field>
         <field name="model">damancom.declaration</field>
         <field name="arch" type="xml">
-            <form string="Déclaration CNSS Damancom">
+            <form string="Declaration CNSS Damancom">
                 <header>
+                    <button name="%(action_damancom_import_preetabli_wizard)d" string="Importer Preetabli"
+                            type="action" class="btn-secondary"
+                            invisible="state != 'draft'"
+                            context="{'default_declaration_id': id, 'default_create_new_declaration': False}"/>
                     <button name="action_load_payslips" string="Charger Fiches de Paie"
                             type="object" class="btn-secondary"
                             invisible="state != 'draft'"/>
                     <button name="action_validate" string="Valider"
                             type="object" class="btn-secondary"
                             invisible="state != 'draft'"/>
-                    <button name="action_generate_bds" string="Générer Fichier BDS"
+                    <button name="action_generate_bds" string="Generer Fichier BDS"
                             type="object" class="btn-primary"
                             invisible="state != 'draft'"/>
-                    <button name="action_download_bds" string="Télécharger BDS"
+                    <button name="action_download_bds" string="Telecharger BDS"
                             type="object" class="btn-primary"
                             invisible="not bds_file"/>
                     <button name="action_mark_submitted" string="Marquer Soumis"
                             type="object" class="btn-secondary"
                             invisible="state != 'generated'"/>
-                    <button name="action_mark_validated" string="Marquer Validé"
+                    <button name="action_mark_validated" string="Marquer Valide"
                             type="object" class="btn-success"
                             invisible="state != 'submitted'"/>
-                    <button name="action_mark_rejected" string="Marquer Rejeté"
+                    <button name="action_mark_rejected" string="Marquer Rejete"
                             type="object" class="btn-warning"
                             invisible="state not in ['generated', 'submitted']"/>
-                    <button name="action_reset_draft" string="Réinitialiser"
+                    <button name="action_reset_draft" string="Reinitialiser"
                             type="object" class="btn-secondary"
                             invisible="state == 'draft'"
-                            confirm="Êtes-vous sûr ? Cela effacera le fichier BDS généré."/>
+                            confirm="Etes-vous sur ? Cela effacera le fichier BDS genere."/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,generated,submitted,validated"/>
                 </header>
@@ -68,7 +72,7 @@
                         </h1>
                     </div>
                     <group>
-                        <group string="Période">
+                        <group string="Periode">
                             <field name="company_id" readonly="state != 'draft'"/>
                             <field name="period_year" readonly="state != 'draft'"/>
                             <field name="period_month" readonly="state != 'draft'"/>
@@ -96,8 +100,19 @@
                             <field name="bds_file" filename="bds_filename" readonly="1"/>
                         </group>
                     </group>
+                    <group string="Preetabli CNSS (AFFEBDS)" invisible="not preetabli_imported and not identif_transfert">
+                        <group>
+                            <field name="preetabli_imported" readonly="1"/>
+                            <field name="identif_transfert" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="preetabli_filename" readonly="1"/>
+                            <field name="preetabli_file" filename="preetabli_filename" readonly="1"
+                                   invisible="not preetabli_file"/>
+                        </group>
+                    </group>
                     <notebook>
-                        <page string="Lignes de Déclaration" name="lines">
+                        <page string="Lignes de Declaration" name="lines">
                             <field name="line_ids" readonly="state != 'draft'">
                                 <list editable="bottom" 
                                       decoration-info="is_entrant">
@@ -107,14 +122,14 @@
                                     <field name="num_cin" optional="hide"/>
                                     <field name="nb_enfants"/>
                                     <field name="jours_declares"/>
-                                    <field name="salaire_reel" sum="Total Réel"/>
-                                    <field name="salaire_plafonne" sum="Total Plafonné"/>
+                                    <field name="salaire_reel" sum="Total Reel"/>
+                                    <field name="salaire_plafonne" sum="Total Plafonne"/>
                                     <field name="situation"/>
                                     <field name="is_entrant"/>
                                 </list>
                             </field>
                         </page>
-                        <page string="Fiches de Paie Liées" name="payslips">
+                        <page string="Fiches de Paie Liees" name="payslips">
                             <field name="payslip_ids">
                                 <list>
                                     <field name="employee_id"/>
@@ -146,15 +161,42 @@
                 <field name="company_id"/>
                 <filter string="Brouillon" name="filter_draft" 
                         domain="[('state', '=', 'draft')]"/>
-                <filter string="Généré" name="filter_generated" 
+                <filter string="Genere" name="filter_generated" 
                         domain="[('state', '=', 'generated')]"/>
                 <filter string="Soumis" name="filter_submitted" 
                         domain="[('state', '=', 'submitted')]"/>
-                <filter string="Validé" name="filter_validated" 
+                <filter string="Valide" name="filter_validated" 
                         domain="[('state', '=', 'validated')]"/>
                 <separator/>
                 <filter string="Principale" name="filter_principale" 
                         domain="[('declaration_type', '=', 'principale')]"/>
-                <filter string="Complémentaire" name="filter_complementaire" 
+                <filter string="Complementaire" name="filter_complementaire" 
                         domain="[('declaration_type', '=', 'complementaire')]"/>
+                <filter name="group_year" 
+                        context="{'group_by': 'period_year'}"/>
+                <filter name="group_state" 
+                        context="{'group_by': 'state'}"/>
+                <filter name="group_type" 
+                        context="{'group_by': 'declaration_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_damancom_declaration" model="ir.actions.act_window">
+        <field name="name">Declarations Damancom CNSS</field>
+        <field name="res_model">damancom.declaration</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_damancom_declaration_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Creer une nouvelle declaration CNSS Damancom
+            </p>
+            <p>
+                Generez le fichier BDS au format officiel CNSS pour la
+                teledeclaration mensuelle sur damancom.ma
+            </p>
+        </field>
+    </record>
+
 </odoo>
