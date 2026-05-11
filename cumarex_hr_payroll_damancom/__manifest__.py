@@ -38,7 +38,9 @@ Le fichier généré peut être :
         'views/res_company_views.xml',
         'views/hr_employee_views.xml',
         'views/hr_payslip_views.xml',
-        'views/damancom_declaration_views.xml',
+        'wizards/damancom_generate_wizard_views.xml
+        wizards/damancom_import_preetabli_wizard_views.xml
+        views/damancom_declaration_views.xml',
         'wizards/damancom_generate_wizard_views.xml',
         'views/damancom_menus.xml',
     ],
