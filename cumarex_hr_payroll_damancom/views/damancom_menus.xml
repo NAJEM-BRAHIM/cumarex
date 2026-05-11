@@ -3,18 +3,15 @@
 
     <menuitem id="menu_damancom_root"
               name="Damancom CNSS"
-              parent="hr.menu_hr_root"
               sequence="50"/>
 
     <menuitem id="menu_damancom_declarations"
               name="Déclarations"
-              parent="menu_damancom_root"
               action="action_damancom_declaration"
               sequence="10"/>
 
     <menuitem id="menu_damancom_new_declaration"
               name="Nouvelle Déclaration (Assistant)"
-              parent="menu_damancom_root"
               action="action_damancom_generate_wizard"
               sequence="20"/>
 
