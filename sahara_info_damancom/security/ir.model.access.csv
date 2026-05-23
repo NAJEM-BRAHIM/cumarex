@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_damancom_declaration_user,damancom.declaration.user,model_damancom_declaration,base.group_user,1,1,1,0
+access_damancom_declaration_manager,damancom.declaration.manager,model_damancom_declaration,base.group_system,1,1,1,1
+access_damancom_declaration_line_user,damancom.declaration.line.user,model_damancom_declaration_line,base.group_user,1,1,1,1
+access_damancom_declaration_line_manager,damancom.declaration.line.manager,model_damancom_declaration_line,base.group_system,1,1,1,1
+access_damancom_generate_wizard,damancom.generate.wizard,model_damancom_generate_wizard,base.group_user,1,1,1,1
+access_damancom_import_preetabli_wizard,damancom.import.preetabli.wizard,model_damancom_import_preetabli_wizard,base.group_user,1,1,1,1

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_damancom_generate_wizard_form" model="ir.ui.view">
+        <field name="name">damancom.generate.wizard.form</field>
+        <field name="model">damancom.generate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Générer Déclaration Damancom">
+                <group>
+                    <group string="Période">
+                        <field name="company_id"/>
+                        <field name="period_year"/>
+                        <field name="period_month"/>
+                    </group>
+                    <group string="Type de Déclaration">
+                        <field name="declaration_type"/>
+                        <field name="sequence_number" 
+                               invisible="declaration_type != 'complementaire'"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_create_declaration" 
+                            string="Créer la Déclaration"
+                            type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_damancom_generate_wizard" model="ir.actions.act_window">
+        <field name="name">Nouvelle Déclaration Damancom</field>
+        <field name="res_model">damancom.generate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

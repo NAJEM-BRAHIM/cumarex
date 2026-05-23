@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_damancom_root"
+              name="Damancom CNSS"
+              sequence="50"/>
+
+    <menuitem id="menu_damancom_declarations"
+              name="Déclarations"
+              parent="menu_damancom_root"
+              action="action_damancom_declaration"
+              sequence="10"/>
+
+    <menuitem id="menu_damancom_new_declaration"
+              name="Nouvelle Déclaration (Assistant)"
+              parent="menu_damancom_root"
+              action="action_damancom_generate_wizard"
+              sequence="20"/>
+
+</odoo>
