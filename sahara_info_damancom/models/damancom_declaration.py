@@ -41,7 +41,7 @@ class DamancomDeclaration(models.Model):
     state = fields.Selection(
         selection=[('draft', 'Brouillon'), ('generated', 'Genere'), ('submitted', 'Soumis a Damancom'),
                    ('validated', 'Valide par CNSS'), ('rejected', 'Rejete')],
-        string='Etat', default='draft', required=True, tracking=True)
+        string='Etat', default='draft', required=True)
     payslip_ids = fields.Many2many('hr.payslip', string='Fiches de paie',
         domain="[('state', 'in', ['done', 'paid']), ('company_id', '=', company_id)]")
 
