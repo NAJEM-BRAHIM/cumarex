@@ -43,14 +43,13 @@ result = SBI - FRAIS_PRO - cnss - amo - cimr - mut
             <field name="appears_on_payslip">False</field>
         </record>
 
-        <!-- IR BRUT - Barème mensuel 2026 -->
+        <!-- IR BRUT - Barème mensuel 2026 (toujours calculé, retourne 0 si SNI exonéré) -->
         <record id="ma_rule_ir_brut" model="hr.salary.rule">
             <field name="name">IR Brut</field>
             <field name="code">IR_BRUT</field>
             <field name="sequence">320</field>
             <field name="category_id" ref="ma_rule_category_ir"/>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = SNI > 3333.33</field>
+            <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 sni = SNI
@@ -72,14 +71,13 @@ result = max(result, 0.0)
             <field name="appears_on_payslip">False</field>
         </record>
 
-        <!-- IR NET (Odoo 19 compatible: charges famille en direct) -->
+        <!-- IR NET (toujours calculé: évite NameError sur IR_BRUT/IR_NET dans NET) -->
         <record id="ma_rule_ir_net" model="hr.salary.rule">
             <field name="name">IR Net</field>
             <field name="code">IR_NET</field>
             <field name="sequence">330</field>
             <field name="category_id" ref="ma_rule_category_ir"/>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = IR_BRUT > 0</field>
+            <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 v = payslip.version_id
