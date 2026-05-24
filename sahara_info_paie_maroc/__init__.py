@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from . import models, hooks
+from . import models
