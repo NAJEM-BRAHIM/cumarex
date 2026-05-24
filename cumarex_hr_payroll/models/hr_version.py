@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from dateutil.relativedelta import relativedelta
 
 
 class HrVersion(models.Model):
@@ -23,6 +24,12 @@ class HrVersion(models.Model):
         string="Personnes à charge",
         default=0,
         help="Nombre de personnes à charge (max 6). 50 DH/personne/mois en 2026."
+    )
+
+    l10n_ma_ir_exonere = fields.Boolean(
+        string="Exonéré d'IR",
+        default=False,
+        help="Cochez cette case si le salarié est exonéré de l'Impôt sur le Revenu."
     )
 
     l10n_ma_indemnite_transport = fields.Float(
@@ -106,7 +113,7 @@ class HrVersion(models.Model):
         if not ref_date:
             return 0.0
         compare_date = payslip_date or fields.Date.today()
-        years = (compare_date - ref_date).days / 365.25
+        years = relativedelta(compare_date, ref_date).years
         if years >= 25:
             return 0.25
         elif years >= 20:
