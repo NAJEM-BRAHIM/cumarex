@@ -120,6 +120,7 @@ def migrate(cr, version):
 
 
 def _upsert_xml_id(cr, module, name, model, res_id):
+    # Odoo 19 : date_update / date_init supprimés de ir_model_data
     cr.execute("""
         SELECT id FROM ir_model_data
         WHERE module = %s AND name = %s LIMIT 1
@@ -127,15 +128,13 @@ def _upsert_xml_id(cr, module, name, model, res_id):
     row = cr.fetchone()
     if row:
         cr.execute("""
-            UPDATE ir_model_data SET res_id = %s, noupdate = false,
-                   date_update = NOW()
+            UPDATE ir_model_data SET res_id = %s, noupdate = false
             WHERE module = %s AND name = %s
         """, (res_id, module, name))
         _logger.info('[paie_maroc] XML ID mis à jour: %s.%s → %s', module, name, res_id)
     else:
         cr.execute("""
-            INSERT INTO ir_model_data
-                (name, module, model, res_id, noupdate, date_update, date_init)
-            VALUES (%s, %s, %s, %s, false, NOW(), NOW())
+            INSERT INTO ir_model_data (name, module, model, res_id, noupdate)
+            VALUES (%s, %s, %s, %s, false)
         """, (name, module, model, res_id))
         _logger.info('[paie_maroc] XML ID créé: %s.%s → %s', module, name, res_id)
