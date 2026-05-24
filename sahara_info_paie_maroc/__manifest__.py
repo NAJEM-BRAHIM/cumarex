@@ -17,14 +17,13 @@ Ce module ajoute des règles salariales adaptées au Maroc 2025-2026 :
 """,
     'author': 'Sahara Info',
     'category': 'Human Resources/Payroll',
-    'version': '19.0.1.0.4',
+    'version': '19.0.1.0.5',
     'license': 'LGPL-3',
     'depends': [
         'hr',
         'hr_payroll',
     ],
     'post_init_hook': 'post_init_hook',
-    'post_migrate': 'post_migrate_hook',
     'data': [
         'data/hr_payroll_structure_type_data.xml',
         'data/hr_salary_rule_category_data.xml',
