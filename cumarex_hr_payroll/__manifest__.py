@@ -38,6 +38,7 @@ Ce module ajoute des règles salariales adaptées au Maroc 2025-2026 :
         'data/hr_salary_rule_net_data.xml',
         'data/hr_payroll_employer_cost_data.xml',
         'views/hr_version_views.xml',
+        'views/report_payslip_templates.xml',
     ],
     'installable': True,
     'application': False,
