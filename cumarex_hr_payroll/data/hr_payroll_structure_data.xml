@@ -3,8 +3,8 @@
     <data noupdate="1">
 
         <record id="hr_payroll_structure_ma_employee" model="hr.payroll.structure">
-            <field name="name">Maroc - Salarié Standard (Cumarex)</field>
-            <field name="code">CUMAREX_MA_STD</field>
+        <field name="name">Maroc - Salarié Standard (Sahara Info Services)</field>
+        <field name="code">SAHARA_INFO_SERVICES_MA_STD</field>
             <field name="country_id" ref="base.ma"/>
             <field name="type_id" ref="structure_type_employee_ma"/>
         </record>

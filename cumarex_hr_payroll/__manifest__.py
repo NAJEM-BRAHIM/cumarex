@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Maroc - Paie Cumarex (Règles Personnalisées)",
+    'name': "Maroc - Paie Sahara Info Services",
     'summary': "Localisation Maroc - Règles salariales personnalisées Odoo 19",
     'description': """
 Module personnalisé de paie Maroc pour Odoo 19
@@ -17,13 +17,14 @@ Ce module ajoute des règles salariales adaptées au Maroc 2025-2026 :
 - Heures supplémentaires
 - Retenues diverses
 """,
-    'author': "Cumarex",
+    'author': "Sahara Info Services",
     'category': 'Human Resources/Payroll',
-    'version': '19.0.1.0.0',
+    'version': '19.0.2.0.0',
     'license': 'LGPL-3',
     'depends': [
         'hr',
         'hr_payroll',
+        'stock',
     ],
     'data': [
         'data/hr_payroll_structure_type_data.xml',

@@ -212,6 +212,7 @@ result = (BASIC + anciennete + hs25 + hs50 + hs100
           + avn_logement + avn_voiture)
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">False</field>
         </record>
 
         <!-- SBI -->
@@ -230,6 +231,7 @@ exo_repr = min(v.l10n_ma_indemnite_representation, BASIC * 0.10) if v else 0
 result = SBG - exo_transport - exo_panier - exo_repr
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+            <field name="appears_on_payslip">False</field>
         </record>
 
         <!-- SBC -->
