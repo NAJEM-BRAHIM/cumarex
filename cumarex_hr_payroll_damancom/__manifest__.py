@@ -25,6 +25,7 @@ sur le portail Damancom (e-BDS).
         'wizards/damancom_import_preetabli_wizard_views.xml',
         'views/damancom_declaration_views.xml',
         'views/damancom_menus.xml',
+        'views/report_payslip_templates.xml',
     ],
     'installable': True,
     'application': False,
