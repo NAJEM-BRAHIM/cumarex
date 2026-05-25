@@ -32,6 +32,12 @@ class HrVersion(models.Model):
         help="Cochez cette case si le salarié est exonéré de l'Impôt sur le Revenu."
     )
 
+    l10n_ma_frais_pro_actif = fields.Boolean(
+        string="Appliquer Frais Professionnels",
+        default=True,
+        help="Décochez cette case si le salarié ne bénéficie pas de la déduction des frais professionnels."
+    )
+
     l10n_ma_indemnite_transport = fields.Float(
         string="Indemnité de transport (DH/mois)",
         default=0.0,

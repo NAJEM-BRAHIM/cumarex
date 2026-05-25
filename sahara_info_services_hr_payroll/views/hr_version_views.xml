@@ -19,6 +19,7 @@
                             <field name="l10n_ma_anciennete_date"/>
                             <field name="l10n_ma_personnes_charge"/>
                             <field name="l10n_ma_ir_exonere"/>
+                            <field name="l10n_ma_frais_pro_actif"/>
                             <field name="l10n_ma_taux_frais_pro"/>
                         </group>
                         <group string="Indemnités Mensuelles (DH)">

@@ -12,10 +12,13 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
 v = payslip.version_id
-avn = (v.l10n_ma_avantage_logement + v.l10n_ma_avantage_voiture) if v else 0
-base_frais = SBI - avn
-taux = float(v.l10n_ma_taux_frais_pro or '35') / 100.0 if v else 0.35
-result = min(base_frais * taux, 35000.0 / 12.0)
+if v and not v.l10n_ma_frais_pro_actif:
+    result = 0.0
+else:
+    avn = (v.l10n_ma_avantage_logement + v.l10n_ma_avantage_voiture) if v else 0
+    base_frais = SBI - avn
+    taux = float(v.l10n_ma_taux_frais_pro or '35') / 100.0 if v else 0.35
+    result = min(base_frais * taux, 35000.0 / 12.0)
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
             <field name="appears_on_payslip">False</field>
